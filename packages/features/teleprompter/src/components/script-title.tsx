@@ -17,7 +17,7 @@ import { GlassView } from './glass-view';
 type Props = {
   title: string;
   palette: GlassPalette;
-  target: RefObject<View | null>;
+  target: RefObject<View | null> | null;
   /** Opens the list of scripts. */
   onOpenList: () => void;
   onRename: (title: string) => Promise<void>;

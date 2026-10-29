@@ -1,6 +1,12 @@
 import { type RefObject, useEffect, useState } from 'react';
 
-import { ArrowLeft, Clock, SlidersHorizontal } from 'lucide-react-native';
+import {
+  ArrowLeft,
+  Clock,
+  SlidersHorizontal,
+  Video,
+  VideoOff,
+} from 'lucide-react-native';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -13,13 +19,17 @@ import { ScriptTitle } from './script-title';
 type Props = {
   title: string;
   palette: GlassPalette;
-  target: RefObject<View | null>;
+  target: RefObject<View | null> | null;
   /** Scroll speed in px/s, used to work out the time left. */
   pxPerSecond: number;
   getProgress: () => { offset: number; max: number };
   onBack: () => void;
   onOpenSettings: () => void;
   onOpenList: () => void;
+  cameraOn: boolean;
+  /** The camera can't be switched off in the middle of a recording. */
+  cameraLocked: boolean;
+  onToggleCamera: () => void;
   onRename: (title: string) => Promise<void>;
   /** Fades the bar out of the way, e.g. while the script is dragged. */
   hidden: boolean;
@@ -37,6 +47,9 @@ export function PrompterTopBar({
   onBack,
   onOpenSettings,
   onOpenList,
+  cameraOn,
+  cameraLocked,
+  onToggleCamera,
   onRename,
   hidden,
 }: Props) {
@@ -145,6 +158,24 @@ export function PrompterTopBar({
 
           <GlassView target={target} palette={palette} style={styles.round}>
             <Pressable
+              accessibilityRole="switch"
+              accessibilityLabel="Camera"
+              accessibilityState={{ checked: cameraOn, disabled: cameraLocked }}
+              disabled={cameraLocked}
+              onPress={onToggleCamera}
+              android_ripple={{ color: palette.control, borderless: true }}
+              style={[styles.fill, cameraLocked && styles.locked]}
+            >
+              {cameraOn ? (
+                <Video color={palette.fg} size={22} />
+              ) : (
+                <VideoOff color={palette.fg} size={22} />
+              )}
+            </Pressable>
+          </GlassView>
+
+          <GlassView target={target} palette={palette} style={styles.round}>
+            <Pressable
               accessibilityRole="button"
               accessibilityLabel="Settings"
               onPress={onOpenSettings}
@@ -173,6 +204,7 @@ const styles = StyleSheet.create({
   },
   round: { width: 48, height: 48, borderRadius: 24 },
   fill: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  locked: { opacity: 0.4 },
   chip: { height: 48, borderRadius: 24, justifyContent: 'center' },
   chipInner: {
     flexDirection: 'row',

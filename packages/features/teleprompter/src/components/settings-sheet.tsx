@@ -7,6 +7,7 @@ import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 
 import {
   BACKGROUND_COLORS,
+  type CameraFacing,
   FONT_SIZE_RANGE,
   type PrompterSettings,
   TEXT_COLORS,
@@ -21,6 +22,11 @@ const ALIGNMENTS = [
   { value: 'left', label: 'Align left', icon: AlignLeft },
   { value: 'center', label: 'Align centre', icon: AlignCenter },
   { value: 'right', label: 'Align right', icon: AlignRight },
+] as const;
+
+const FACINGS = [
+  { value: 'front', label: 'Front' },
+  { value: 'back', label: 'Back' },
 ] as const;
 
 type Props = {
@@ -87,6 +93,23 @@ export function SettingsSheet({ open, onClose, settings, onChange }: Props) {
                 onPress={() => change({ align: value satisfies TextAlign })}
               >
                 <Icon color="#ffffff" size={22} />
+              </AlignButton>
+            ))}
+          </View>
+        </Section>
+
+        <Section label="Camera">
+          <View style={styles.segments}>
+            {FACINGS.map(({ value, label }) => (
+              <AlignButton
+                key={value}
+                label={`${label} camera`}
+                selected={settings.cameraFacing === value}
+                onPress={() =>
+                  change({ cameraFacing: value satisfies CameraFacing })
+                }
+              >
+                <Text style={styles.segmentText}>{label}</Text>
               </AlignButton>
             ))}
           </View>
@@ -176,6 +199,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  segmentText: { color: '#ffffff', fontSize: 15, fontWeight: '600' },
   segmentSelected: { backgroundColor: ACCENT },
   switchRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
 });

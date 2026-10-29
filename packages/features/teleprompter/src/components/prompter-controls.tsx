@@ -2,6 +2,7 @@ import type { ComponentType, RefObject } from 'react';
 
 import Slider from '@react-native-community/slider';
 import {
+  Circle,
   FlipHorizontal2,
   Minus,
   Pause,
@@ -9,6 +10,7 @@ import {
   Plus,
   Rabbit,
   RotateCcw,
+  Square,
   Turtle,
 } from 'lucide-react-native';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -31,14 +33,20 @@ type Props = {
   fontSize: number;
   mirror: boolean;
   playing: boolean;
+  /** The camera is on, so Start becomes Record. */
+  cameraOn: boolean;
+  recording: boolean;
   palette: GlassPalette;
-  target: RefObject<View | null>;
+  target: RefObject<View | null> | null;
   onChange: (patch: Partial<PrompterSettings>) => void;
   onToggle: () => void;
   onRestart: () => void;
   /** Fades the controls out of the way, e.g. while the script is dragged. */
   hidden: boolean;
 };
+
+// White on this red is about 4.8:1, above the 4.5:1 text minimum.
+const RECORD_RED = '#dc2626';
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
@@ -48,6 +56,8 @@ export function PrompterControls({
   fontSize,
   mirror,
   playing,
+  cameraOn,
+  recording,
   hidden,
   palette,
   target,
@@ -84,11 +94,12 @@ export function PrompterControls({
         >
           <GlassView target={target} palette={palette} style={styles.compact}>
             <RoundButton
-              icon={Pause}
-              label="Pause"
+              icon={recording ? Square : Pause}
+              label={recording ? 'Stop recording' : 'Pause'}
               palette={palette}
               size={52}
-              active
+              active={!recording}
+              color={recording ? RECORD_RED : undefined}
               onPress={onToggle}
             />
 
@@ -184,19 +195,30 @@ export function PrompterControls({
 
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="Start"
+              accessibilityLabel={cameraOn ? 'Record' : 'Start'}
               onPress={onToggle}
               hitSlop={2}
               android_ripple={{ color: 'rgba(255,255,255,0.35)' }}
-              style={[styles.start, { backgroundColor: palette.accent }]}
+              style={[
+                styles.start,
+                { backgroundColor: cameraOn ? RECORD_RED : palette.accent },
+              ]}
             >
-              <Play color={palette.onAccent} size={20} />
+              {cameraOn ? (
+                <Circle
+                  color={palette.onAccent}
+                  fill={palette.onAccent}
+                  size={16}
+                />
+              ) : (
+                <Play color={palette.onAccent} size={20} />
+              )}
 
               <Text
                 maxFontSizeMultiplier={1.5}
                 style={[styles.startText, { color: palette.onAccent }]}
               >
-                Start
+                {cameraOn ? 'Record' : 'Start'}
               </Text>
             </Pressable>
 
@@ -251,12 +273,15 @@ function RoundButton(
     size?: number;
     /** A filled accent button, for the main action. */
     active?: boolean;
+    /** Fills the button with this colour instead of the accent. */
+    color?: string;
     /** Makes this a switch showing the given on/off state. */
     switchState?: boolean;
   },
 ) {
   const { palette, icon: Icon, size = 44, switchState } = props;
-  const filled = props.active || switchState === true;
+  const filled =
+    props.active || props.color !== undefined || switchState === true;
 
   return (
     <Pressable
@@ -276,7 +301,9 @@ function RoundButton(
           width: size,
           height: size,
           borderRadius: size / 2,
-          backgroundColor: filled ? palette.accent : palette.control,
+          backgroundColor: filled
+            ? (props.color ?? palette.accent)
+            : palette.control,
           opacity: props.disabled ? 0.4 : 1,
           // A ring as well as the fill, so "on" doesn't rely on colour alone.
           borderWidth: switchState ? 2 : 0,

@@ -22,7 +22,7 @@ type Props = {
   onClose: () => void;
   currentId: string;
   palette: GlassPalette;
-  target: RefObject<View | null>;
+  target: RefObject<View | null> | null;
   /** Distance from the top of the screen, just below the top bar. */
   top: number;
   onSelect: (id: string) => void;

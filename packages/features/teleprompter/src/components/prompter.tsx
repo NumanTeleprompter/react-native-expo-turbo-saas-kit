@@ -2,9 +2,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { BlurTargetView } from 'expo-blur';
 import { useKeepAwake } from 'expo-keep-awake';
-import { router } from 'expo-router';
+import { router, useIsFocused } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
+  Alert,
   BackHandler,
   Pressable,
   StyleSheet,
@@ -31,6 +32,8 @@ import {
 } from '../lib/prompter-settings';
 import { type Script, renameScript } from '../lib/script-store';
 import { useAutoScroll } from '../lib/use-auto-scroll';
+import { useCameraAccess } from '../lib/use-camera-access';
+import { CameraLayer } from './camera-layer';
 import { MarkdownText } from './markdown-text';
 import { PrompterControls } from './prompter-controls';
 import { PrompterTopBar } from './prompter-top-bar';
@@ -58,6 +61,20 @@ export function Prompter({ script }: { script: Script }) {
   const [countdown, setCountdown] = useState<number | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [switcherOpen, setSwitcherOpen] = useState(false);
+  const [cameraOn, setCameraOn] = useState(false);
+  const [recording, setRecording] = useState(false);
+  const requestCameraAccess = useCameraAccess();
+
+  // A recording lasts as long as the script plays: pausing, reaching the end
+  // or opening a sheet ends it and opens the review.
+  useEffect(() => {
+    if (!playing) {
+      setRecording(false);
+    }
+  }, [playing]);
+  // The prompter stays mounted under the review screen, so let go of the
+  // camera while it isn't showing.
+  const focused = useIsFocused();
   const insets = useSafeAreaInsets();
 
   // The glass controls blur whatever is drawn inside this target.
@@ -66,6 +83,8 @@ export function Prompter({ script }: { script: Script }) {
     () => glassPalette(settings.backgroundColor),
     [settings.backgroundColor],
   );
+  // Over a live camera, glass drops its blur and uses a solid surface.
+  const glassTarget = cameraOn ? null : blurTarget;
   const pxPerSecond = scrollSpeed(settings);
 
   const shift = useSharedValue(0);
@@ -140,6 +159,7 @@ export function Prompter({ script }: { script: Script }) {
     if (countdown === 0) {
       setCountdown(null);
       setPlaying(true);
+      setRecording(cameraOn);
 
       return;
     }
@@ -147,7 +167,7 @@ export function Prompter({ script }: { script: Script }) {
     const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
 
     return () => clearTimeout(timer);
-  }, [countdown]);
+  }, [countdown, cameraOn]);
 
   // Hardware back closes the sheet or list first instead of leaving the
   // prompter.
@@ -178,6 +198,17 @@ export function Prompter({ script }: { script: Script }) {
       setCountdown((current) => (current === null ? COUNTDOWN_SECONDS : null));
     }
   };
+
+  const toggleCamera = async () => {
+    if (cameraOn) {
+      setCameraOn(false);
+    } else if (await requestCameraAccess()) {
+      setCameraOn(true);
+    }
+  };
+
+  const onRecorded = (path: string) =>
+    router.push(`/review?uri=${encodeURIComponent(`file://${path}`)}`);
 
   const openSettings = () => {
     setPlaying(false);
@@ -211,9 +242,29 @@ export function Prompter({ script }: { script: Script }) {
     >
       <StatusBar hidden />
 
+      {cameraOn && focused ? (
+        <CameraLayer
+          facing={settings.cameraFacing}
+          recording={recording}
+          onFinished={onRecorded}
+          onError={(error) => {
+            console.error(error);
+            setRecording(false);
+            Alert.alert('Recording failed');
+          }}
+        />
+      ) : null}
+
       <BlurTargetView
         ref={blurTarget}
-        style={[styles.flex, { backgroundColor: settings.backgroundColor }]}
+        style={[
+          styles.flex,
+          {
+            backgroundColor: cameraOn
+              ? 'transparent'
+              : settings.backgroundColor,
+          },
+        ]}
       >
         {/* The blur only captures what is drawn inside the target, so give it
             an opaque page of its own to frost. */}
@@ -221,7 +272,12 @@ export function Prompter({ script }: { script: Script }) {
           pointerEvents="none"
           style={[
             StyleSheet.absoluteFill,
-            { backgroundColor: settings.backgroundColor },
+            {
+              // Dimmed over the camera, so the text stays readable.
+              backgroundColor: cameraOn
+                ? withAlpha(settings.backgroundColor, 0.65)
+                : settings.backgroundColor,
+            },
           ]}
         />
 
@@ -282,12 +338,15 @@ export function Prompter({ script }: { script: Script }) {
           <PrompterTopBar
             title={script.title}
             palette={palette}
-            target={blurTarget}
+            target={glassTarget}
             pxPerSecond={pxPerSecond}
             getProgress={scroll.getProgress}
             onBack={() => router.back()}
             onOpenSettings={openSettings}
             onOpenList={openSwitcher}
+            cameraOn={cameraOn}
+            cameraLocked={recording}
+            onToggleCamera={() => void toggleCamera()}
             onRename={(title) => renameScript(script.id, title)}
             hidden={scrolling}
           />
@@ -297,9 +356,11 @@ export function Prompter({ script }: { script: Script }) {
             fontSize={settings.fontSize}
             mirror={settings.mirror}
             playing={playing}
+            cameraOn={cameraOn}
+            recording={recording}
             hidden={scrolling}
             palette={palette}
-            target={blurTarget}
+            target={glassTarget}
             onChange={update}
             onToggle={toggle}
             onRestart={scroll.restart}
@@ -312,7 +373,7 @@ export function Prompter({ script }: { script: Script }) {
         onClose={() => setSwitcherOpen(false)}
         currentId={script.id}
         palette={palette}
-        target={blurTarget}
+        target={glassTarget}
         top={insets.top + 12 + 48 + 8}
         onSelect={selectScript}
       />

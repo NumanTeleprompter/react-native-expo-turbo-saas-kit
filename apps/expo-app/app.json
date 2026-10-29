@@ -14,14 +14,22 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.expo.expo-app"
+      "bundleIdentifier": "com.expo.expo-app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Allow the camera so you can record yourself reading a script.",
+        "NSMicrophoneUsageDescription": "Allow the microphone so your recordings include sound."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.expo.expoapp"
+      "package": "com.expo.expoapp",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -43,6 +51,13 @@
         "expo-image-picker",
         {
           "photosPermission": "Allow the app to access your photos so you can set a profile picture."
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "savePhotosPermission": "Allow saving your recordings to your gallery.",
+          "isAccessMediaLocationEnabled": false
         }
       ]
     ],

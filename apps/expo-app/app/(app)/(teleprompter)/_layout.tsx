@@ -6,6 +6,7 @@ export default function TeleprompterLayout() {
       <Stack.Screen name="index" options={{ title: 'Scripts' }} />
       <Stack.Screen name="edit/[id]" options={{ title: 'Script' }} />
       <Stack.Screen name="prompter/[id]" options={{ headerShown: false }} />
+      <Stack.Screen name="review" options={{ headerShown: false }} />
     </Stack>
   );
 }

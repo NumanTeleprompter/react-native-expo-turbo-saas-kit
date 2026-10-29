@@ -1,6 +1,7 @@
 import { createPersistedStore } from './persisted-store';
 
 export type TextAlign = 'left' | 'center' | 'right';
+export type CameraFacing = 'front' | 'back';
 
 export type PrompterSettings = {
   /** Reading speed level; see `scrollSpeed`. */
@@ -12,6 +13,7 @@ export type PrompterSettings = {
   /** `#rrggbb` */
   backgroundColor: string;
   align: TextAlign;
+  cameraFacing: CameraFacing;
 };
 
 export const SPEED_RANGE = { min: 1, max: 20 } as const;
@@ -42,6 +44,7 @@ const DEFAULTS: PrompterSettings = {
   textColor: TEXT_COLORS[0].value,
   backgroundColor: BACKGROUND_COLORS[0].value,
   align: 'left',
+  cameraFacing: 'front',
 };
 
 const store = createPersistedStore<Partial<PrompterSettings>>(
@@ -51,6 +54,7 @@ const store = createPersistedStore<Partial<PrompterSettings>>(
 
 const HEX_COLOR = /^#[0-9a-f]{6}$/i;
 const ALIGNMENTS: readonly TextAlign[] = ['left', 'center', 'right'];
+const FACINGS: readonly CameraFacing[] = ['front', 'back'];
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
@@ -78,6 +82,9 @@ function sanitize(settings: PrompterSettings): PrompterSettings {
     align: ALIGNMENTS.includes(settings.align)
       ? settings.align
       : DEFAULTS.align,
+    cameraFacing: FACINGS.includes(settings.cameraFacing)
+      ? settings.cameraFacing
+      : DEFAULTS.cameraFacing,
   };
 }
 
