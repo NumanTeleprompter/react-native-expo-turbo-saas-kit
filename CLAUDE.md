@@ -31,7 +31,7 @@ Scrolling is the product, so protect it. Target 120 fps on phones that support i
 - Keep the scroll loop on the UI thread with no JavaScript per frame. Anything that polls (like the time left) must be slow and isolated to its own component.
 - Don't add blur, shadows or layout work to the scroll path. If a camera preview goes behind the script, drop blur while recording and use opaque or translucent controls.
 - Measure on a real phone with a release build before and after a change that could affect scrolling. Debug builds and the emulator are only a rough guide.
-- Adaptive refresh rate (Android 15 and later) gives an auto-scrolling animation only about 60 Hz by default. Reaching 120 Hz needs the app to request it (`View.setRequestedFrameRate`), which React Native doesn't do, so it will need a small native module.
+- Adaptive refresh rate (Android 15 and later) gives an auto-scrolling animation only about 60 Hz by default. Reaching 120 Hz needs the app to ask for it, which React Native doesn't do. `packages/frame-rate` sets the window's `preferredRefreshRate` while a script plays (verified on a Pixel 10 Pro XL: `dumpsys display` shows an `APP_REQUEST` vote of 120). `View.setRequestedFrameRate` on the decor view did nothing.
 
 ---
 
@@ -74,3 +74,5 @@ Setup: if `apps/expo-app/.env` is missing, copy it from `.env.template`, and hav
 - **Reanimated Babel plugin:** warns on any `.value` inside an inline `style`, even a plain object's; read it into a variable first. Two `transform` styles on one view replace each other, so combine them in one list.
 - **Glass (`expo-blur`):** a `BlurView` only blurs what is drawn inside its `BlurTargetView`, not the target's own background. Keep an opaque page layer inside the target, or the glass renders as flat light grey. Also, `hitSlop` isn't delivered outside a clipping parent, so buttons inside glass are 48dp themselves.
 - **Testing on the emulator:** `adb shell input text` crashes the dev build (NPE in `ReactActivityDelegate.onKeyUp`) when no text input has focus, and the stray keys land in other apps. Tap the field first and confirm with `adb shell dumpsys input_method | grep mServedView`.
+- **Stale release bundle:** `gradlew app:installRelease` can reuse an old JS bundle after edits in `packages/*` (the bundle size stays the same). Add `app:createBundleReleaseJsAndAssets --rerun` before it. Check a measurement is against the build you think it is.
+- **Measuring refresh rate:** with the script playing and hands off the screen (a touch pauses it), run `adb shell dumpsys display | grep -E "APP_REQUEST|mActiveRenderFrameRate"`.

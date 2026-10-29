@@ -1,0 +1,16 @@
+{
+  "name": "@kit/frame-rate",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/index.ts",
+  "prettier": "@kit/prettier-config",
+  "devDependencies": {
+    "@kit/prettier-config": "workspace:*",
+    "expo": "*",
+    "react-native": "*"
+  },
+  "peerDependencies": {
+    "expo": "*",
+    "react-native": "*"
+  }
+}

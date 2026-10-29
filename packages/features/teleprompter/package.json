@@ -11,6 +11,7 @@
   },
   "devDependencies": {
     "@kit/eslint-config": "workspace:*",
+    "@kit/frame-rate": "workspace:*",
     "@kit/prettier-config": "workspace:*",
     "@kit/tailwind-config": "workspace:*",
     "@kit/typescript-config": "workspace:*",

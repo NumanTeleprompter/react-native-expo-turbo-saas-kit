@@ -36,6 +36,7 @@
     "@expo/vector-icons": "catalog:",
     "@kit/account": "workspace:*",
     "@kit/auth": "workspace:*",
+    "@kit/frame-rate": "workspace:*",
     "@kit/supabase": "workspace:^",
     "@kit/teleprompter": "workspace:*",
     "@kit/ui": "workspace:*",

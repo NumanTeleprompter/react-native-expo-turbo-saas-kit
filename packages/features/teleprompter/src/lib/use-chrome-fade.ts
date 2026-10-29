@@ -7,7 +7,7 @@ import {
 } from 'react-native-reanimated';
 
 /**
- * Fades controls out quickly and back in gently. Reanimated skips or shortens
+ * Fades controls out and back in almost instantly. Reanimated skips or shortens
  * the animation when the system's reduce-motion setting is on.
  */
 export function useChromeFade(hidden: boolean) {
@@ -15,7 +15,7 @@ export function useChromeFade(hidden: boolean) {
 
   useEffect(() => {
     opacity.value = withTiming(hidden ? 0 : 1, {
-      duration: hidden ? 120 : 200,
+      duration: hidden ? 60 : 100,
     });
   }, [hidden, opacity]);
 

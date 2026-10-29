@@ -19,6 +19,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { requestFrameRate } from '@kit/frame-rate';
+
 import { withAlpha } from '../lib/color';
 import { glassPalette } from '../lib/glass';
 import {
@@ -43,7 +45,7 @@ const READING_LINE = 0.35;
 // screen height, so the text being styled stays visible above the sheet.
 const SETTINGS_SHIFT = 0.3;
 // How long after a scroll settles the controls fade back in.
-const CONTROLS_RETURN_MS = 250;
+const CONTROLS_RETURN_MS = 80;
 // The longest the controls stay hidden if no end-of-scroll event arrives.
 const MAX_HIDDEN_MS = 8000;
 
@@ -118,6 +120,17 @@ export function Prompter({ script }: { script: Script }) {
     onDrag: () => setPlaying(false),
     onScrollingChange,
   });
+
+  // Android holds a self-scrolling script at about 60 Hz unless asked.
+  useEffect(() => {
+    if (!playing) {
+      return;
+    }
+
+    requestFrameRate(120);
+
+    return () => requestFrameRate(0);
+  }, [playing]);
 
   useEffect(() => {
     if (countdown === null) {
