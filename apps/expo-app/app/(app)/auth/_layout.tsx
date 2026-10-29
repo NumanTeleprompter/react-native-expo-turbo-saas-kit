@@ -40,14 +40,6 @@ export default function AuthTabsLayout() {
           />
 
           <Stack.Screen
-            name="callback"
-            options={{
-              title: '',
-              headerShown: false,
-            }}
-          />
-
-          <Stack.Screen
             name="error"
             options={{
               title: '',

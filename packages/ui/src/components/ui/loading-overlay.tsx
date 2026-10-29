@@ -3,6 +3,7 @@ import type { PropsWithChildren } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 
 import { cn } from '../../lib/utils';
+import { Text } from './text';
 
 export function LoadingOverlay({
   children,
@@ -29,7 +30,11 @@ export function LoadingOverlay({
     >
       <ActivityIndicator size={size} />
 
-      <View className={'text-muted-foreground text-sm'}>{children}</View>
+      {typeof children === 'string' ? (
+        <Text variant={'muted'}>{children}</Text>
+      ) : (
+        children
+      )}
     </View>
   );
 }

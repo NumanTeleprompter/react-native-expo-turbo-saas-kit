@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
+import { Platform } from 'react-native';
 
 import * as Linking from 'expo-linking';
 import { router } from 'expo-router';
 
-import { useCreateSessionFromUrl } from '@kit/auth';
+import { getAuthLinkType, useCreateSessionFromUrl } from '@kit/auth';
 import { LoadingOverlay } from '@kit/ui';
 
 export default function CallbackPage() {
@@ -17,10 +18,17 @@ export default function CallbackPage() {
       }
 
       try {
-        const session = await createSessionFromUrl(url);
+        // On web, `useURL` drops the `#access_token=...` fragment, so read
+        // the real browser URL instead.
+        const link = Platform.OS === 'web' ? window.location.href : url;
+        const session = await createSessionFromUrl(link);
 
         if (session) {
-          return router.replace('/');
+          // Password recovery links land on the account settings, where the
+          // user can set a new password.
+          return router.replace(
+            getAuthLinkType(link) === 'recovery' ? '/settings/account' : '/',
+          );
         }
       } catch (error) {
         console.error(error);

@@ -5,9 +5,12 @@ import { View } from 'react-native';
 import { useRequestResetPassword } from '@kit/supabase';
 import { Button, Input, onValidationErrors, Text, toast } from '@kit/ui';
 
+import { useCreateDeepLink } from '../lib/deep-links';
 import { EmailSchema } from '../lib/schema';
 
 export function EmailPasswordResetForm() {
+  const redirectTo = useCreateDeepLink();
+
   const form = useForm({
     resolver: zodResolver(EmailSchema),
     defaultValues: {
@@ -43,7 +46,7 @@ export function EmailPasswordResetForm() {
           onPress={form.handleSubmit((data) => {
             passwordResetMutation.mutate({
               email: data.email,
-              redirectTo: '/',
+              redirectTo,
             });
 
             toast.success('We sent you an email to reset your password.');

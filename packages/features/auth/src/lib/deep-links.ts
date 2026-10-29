@@ -12,6 +12,17 @@ export function useCreateDeepLink() {
   });
 }
 
+/**
+ * @name getAuthLinkType
+ * @description Returns the Supabase auth link type (e.g. `signup`,
+ * `recovery`) carried by an auth callback URL, if any.
+ */
+export function getAuthLinkType(url: string) {
+  const { params } = QueryParams.getQueryParams(url);
+
+  return params.type;
+}
+
 export function useCreateSessionFromUrl() {
   const supabase = useSupabase();
 
