@@ -69,6 +69,7 @@ catalog:
   expo-image-manipulator: ~55.0.16
   expo-image-picker: ~55.0.20
   expo-font: ~55.0.7
+  expo-keep-awake: ~55.0.8
   expo-linking: ~55.0.15
   expo-router: ~55.0.14
   expo-secure-store: ~55.0.14

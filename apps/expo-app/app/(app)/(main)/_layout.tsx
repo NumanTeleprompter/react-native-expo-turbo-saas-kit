@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 import { Redirect, Tabs } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { HomeIcon, SettingsIcon } from 'lucide-react-native';
+import { SettingsIcon } from 'lucide-react-native';
 
 import {
   AuthProvider,
@@ -33,18 +33,7 @@ export default function MainLayout() {
 
 function MainLayoutTabs() {
   return (
-    <Tabs initialRouteName={'index'}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          href: '/',
-          tabBarIcon: ({ color, size }) => (
-            <HomeIcon color={color} size={size} />
-          ),
-        }}
-      />
-
+    <Tabs initialRouteName={'settings'}>
       <Tabs.Screen
         name="settings"
         options={{

@@ -1,5 +1,6 @@
 import { Slot } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
 
 // root provider
 import { RootProvider } from '../components/root-provider';
@@ -12,6 +13,7 @@ void SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   return (
     <RootProvider>
+      <StatusBar style="auto" />
       <Slot />
     </RootProvider>
   );

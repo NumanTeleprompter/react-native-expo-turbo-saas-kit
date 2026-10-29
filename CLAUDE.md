@@ -18,10 +18,11 @@ How Claude should approach every task here. These govern the whole workflow — 
 
 ## Project
 
-Expo + Supabase starter kit (MakerKit), a pnpm + Turborepo monorepo. It targets iOS, Android and web. It ships email/password auth, a profile and account settings area, and protected routes. There are no product features yet.
+Expo + Supabase starter kit (MakerKit), a pnpm + Turborepo monorepo. It targets iOS, Android and web. It ships email/password auth, a profile and account settings area, and protected routes. On top of it sits the product: a device-only teleprompter. Scripts and prompter settings live in AsyncStorage, with no account or network. It is the home screen at `/`; the template's auth and settings screens still exist but aren't linked from it.
 
 - **App:** `apps/expo-app` — Expo Router (file-based), NativeWind, React Query, React Hook Form + Zod.
-- **Packages:** `packages/features/{auth,account}`, `packages/supabase` (client, auth hooks), `packages/ui` (`@kit/ui` components), `tooling/*` (shared configs).
+- **Packages:** `packages/features/{auth,account,teleprompter}`, `packages/supabase` (client, auth hooks), `packages/ui` (`@kit/ui` components), `tooling/*` (shared configs).
+- **Teleprompter:** the scroll loop is `lib/use-auto-scroll.ts` (Reanimated frame callback, UI thread). Scroll speed in px/s scales with font size, so a speed level keeps the same reading pace. Routes are in `app/(app)/(teleprompter)`.
 - **Backend:** local Supabase (Docker) in `apps/expo-app/supabase`. The only table is `public.accounts`, with RLS and a signup trigger.
 - **Conventions:** `.cursorrules` has the full code standards. The key ones are kebab-case files, types over interfaces, features in `packages/features`, RLS on every new table, and explicit `public.` schemas.
 
@@ -37,6 +38,7 @@ Run from the repo root. `pnpm` is pinned by `packageManager`, so run it from ins
 | Reset DB / regenerate types | `pnpm supabase:web:reset` / `pnpm supabase:web:typegen` |
 | Typecheck / lint / format | `pnpm typecheck` / `pnpm lint` / `pnpm format` |
 | Test | `pnpm test` runs jest in watch mode and no tests exist yet, so don't run it unattended |
+| Android | From `apps/expo-app`: `JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" ANDROID_HOME="$HOME/Library/Android/sdk" pnpm exec expo run:android` (needs a running emulator or device) |
 
 Setup: if `apps/expo-app/.env` is missing, copy it from `.env.template`, and have Docker (or OrbStack) running. Confirmation and recovery emails land in Mailpit at `http://127.0.0.1:54324`. Studio is at `http://127.0.0.1:54323`.
 
@@ -46,3 +48,6 @@ Setup: if `apps/expo-app/.env` is missing, copy it from `.env.template`, and hav
 - **Auth links on web:** `Linking.useURL()` drops the `#access_token=…` fragment, so `/auth/callback` reads `window.location.href`. The callback route lives in the `(public)` group, outside the signed-out-only auth layout. An inline script in `app/+html.tsx` forwards links that land on `/` to `/auth/callback`.
 - **Password recovery:** `/auth/password-reset` only requests the email. The recovery link then lands on `/settings/account`, where the password form lives.
 - **Text:** string children must be wrapped in `<Text>`; a raw string inside a `<View>` throws on every platform.
+- **Android Gradle:** React Native 0.83.6's Gradle plugin pins `foojay-resolver` 0.5.0, which fails on the Gradle 9.0.0 wrapper that prebuild generates (`JvmVendorSpec ... IBM_SEMERU`). After the first `expo run:android`, set `distributionUrl` in `android/gradle/wrapper/gradle-wrapper.properties` to `gradle-8.14.3-bin.zip`. `android/` is gitignored, so redo this whenever it is regenerated. JDK 24 is too new; use Android Studio's JDK as above.
+- **NativeWind `Pressable`:** function-style props (`style={({ pressed }) => ...}`) are ignored. Use a static style plus `android_ripple`.
+- **Testing on the emulator:** `adb shell input text` crashes the dev build (NPE in `ReactActivityDelegate.onKeyUp`) when no text input has focus, and the stray keys land in other apps. Tap the field first and confirm with `adb shell dumpsys input_method | grep mServedView`.

@@ -1,0 +1,37 @@
+{
+  "name": "@kit/teleprompter",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "scripts": {
+    "clean": "git clean -xdf .turbo node_modules",
+    "format": "prettier --check \"**/*.{ts,tsx}\"",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@kit/eslint-config": "workspace:*",
+    "@kit/prettier-config": "workspace:*",
+    "@kit/tailwind-config": "workspace:*",
+    "@kit/typescript-config": "workspace:*",
+    "@kit/ui": "workspace:*",
+    "@react-native-async-storage/async-storage": "catalog:",
+    "@types/react": "catalog:",
+    "expo-crypto": "catalog:",
+    "expo-keep-awake": "catalog:",
+    "expo-router": "catalog:",
+    "expo-status-bar": "catalog:",
+    "lucide-react-native": "catalog:",
+    "react": "catalog:",
+    "react-native-reanimated": "catalog:",
+    "react-native-safe-area-context": "catalog:",
+    "react-native-worklets": "catalog:"
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "@kit/eslint-config"
+    ]
+  },
+  "prettier": "@kit/prettier-config"
+}

@@ -4,8 +4,12 @@ export default function AppLayout() {
   return (
     <Stack>
       <Stack.Screen name="auth" options={{ headerShown: false }} />
-      <Stack.Screen name="(public)" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="(public)/auth/callback"
+        options={{ headerShown: false }}
+      />
       <Stack.Screen name="(main)" options={{ headerShown: false }} />
+      <Stack.Screen name="(teleprompter)" options={{ headerShown: false }} />
     </Stack>
   );
 }

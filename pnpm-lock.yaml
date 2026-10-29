@@ -204,6 +204,9 @@ catalogs:
     expo-image-picker:
       specifier: ~55.0.20
       version: 55.0.20
+    expo-keep-awake:
+      specifier: ~55.0.8
+      version: 55.0.8
     expo-linking:
       specifier: ~55.0.15
       version: 55.0.15
@@ -368,6 +371,9 @@ importers:
       '@kit/supabase':
         specifier: workspace:^
         version: link:../../packages/supabase
+      '@kit/teleprompter':
+        specifier: workspace:*
+        version: link:../../packages/features/teleprompter
       '@kit/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -395,6 +401,9 @@ importers:
       expo-font:
         specifier: 'catalog:'
         version: 55.0.7(expo@55.0.24)(react-native@0.83.6(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)
+      expo-keep-awake:
+        specifier: 'catalog:'
+        version: 55.0.8(expo@55.0.24)(react@19.2.0)
       expo-linking:
         specifier: 'catalog:'
         version: 55.0.15(expo@55.0.24)(react-native@0.83.6(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)
@@ -598,6 +607,57 @@ importers:
       zod:
         specifier: 'catalog:'
         version: 3.25.76
+
+  packages/features/teleprompter:
+    devDependencies:
+      '@kit/eslint-config':
+        specifier: workspace:*
+        version: link:../../../tooling/eslint-config
+      '@kit/prettier-config':
+        specifier: workspace:*
+        version: link:../../../tooling/prettier-config
+      '@kit/tailwind-config':
+        specifier: workspace:*
+        version: link:../../../tooling/tailwind-config
+      '@kit/typescript-config':
+        specifier: workspace:*
+        version: link:../../../tooling/typescript-config
+      '@kit/ui':
+        specifier: workspace:*
+        version: link:../../ui
+      '@react-native-async-storage/async-storage':
+        specifier: 'catalog:'
+        version: 2.2.0(react-native@0.83.6(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.14
+      expo-crypto:
+        specifier: 'catalog:'
+        version: 55.0.15(expo@55.0.24)
+      expo-keep-awake:
+        specifier: 'catalog:'
+        version: 55.0.8(expo@55.0.24)(react@19.2.0)
+      expo-router:
+        specifier: 'catalog:'
+        version: 55.0.14(88fe2bfe77a343a050186e565ebd4d42)
+      expo-status-bar:
+        specifier: 'catalog:'
+        version: 55.0.6(react-native@0.83.6(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)
+      lucide-react-native:
+        specifier: 'catalog:'
+        version: 1.16.0(react-native-svg@15.15.3(react-native@0.83.6(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0))(react-native@0.83.6(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)
+      react:
+        specifier: 'catalog:'
+        version: 19.2.0
+      react-native-reanimated:
+        specifier: 'catalog:'
+        version: 4.2.1(react-native-worklets@0.7.4(@babel/core@7.29.0)(react-native@0.83.6(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0))(react-native@0.83.6(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)
+      react-native-safe-area-context:
+        specifier: 'catalog:'
+        version: 5.6.2(react-native@0.83.6(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)
+      react-native-worklets:
+        specifier: 'catalog:'
+        version: 0.7.4(@babel/core@7.29.0)(react-native@0.83.6(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)
 
   packages/supabase:
     dependencies:
