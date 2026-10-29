@@ -49,6 +49,20 @@ export async function saveScript(input: {
   return id;
 }
 
+/**
+ * Changes only a script's title. It leaves `updatedAt` alone, because a
+ * rename isn't an edit and shouldn't reshuffle the list.
+ */
+export function renameScript(id: string, title: string) {
+  return store.update((scripts) =>
+    scripts.map((script) =>
+      script.id === id
+        ? { ...script, title: title.trim() || 'Untitled' }
+        : script,
+    ),
+  );
+}
+
 export function deleteScript(id: string) {
   return store.update((scripts) =>
     scripts.filter((script) => script.id !== id),

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import type Animated from 'react-native-reanimated';
 import {
@@ -20,13 +20,21 @@ type Options = {
   onEnd: () => void;
   /** Called when the user starts dragging the script by hand. */
   onDrag: () => void;
+  /** True while the user drags or flings the script, false once it settles. */
+  onScrollingChange: (scrolling: boolean) => void;
 };
 
 /**
  * Advances a ScrollView by elapsed time on the UI thread, so the speed is
  * constant regardless of frame rate or JS-thread load.
  */
-export function useAutoScroll({ playing, speed, onEnd, onDrag }: Options) {
+export function useAutoScroll({
+  playing,
+  speed,
+  onEnd,
+  onDrag,
+  onScrollingChange,
+}: Options) {
   const ref = useAnimatedRef<Animated.ScrollView>();
   const offset = useSharedValue(0);
   const contentHeight = useSharedValue(0);
@@ -76,7 +84,20 @@ export function useAutoScroll({ playing, speed, onEnd, onDrag }: Options) {
 
   const onScroll = useAnimatedScrollHandler({
     onBeginDrag: () => {
+      // Stop on the UI thread right away; waiting for React to commit lets the
+      // frame callback keep scrolling against the finger.
+      isPlaying.value = false;
       scheduleOnRN(onDrag);
+      scheduleOnRN(onScrollingChange, true);
+    },
+    onEndDrag: (event) => {
+      // With no fling, the scroll has already settled.
+      if (Math.abs(event.velocity?.y ?? 0) < 0.05) {
+        scheduleOnRN(onScrollingChange, false);
+      }
+    },
+    onMomentumEnd: () => {
+      scheduleOnRN(onScrollingChange, false);
     },
     onScroll: (event) => {
       // Follow manual scrolling so playback resumes from where the user left.
@@ -86,9 +107,19 @@ export function useAutoScroll({ playing, speed, onEnd, onDrag }: Options) {
     },
   });
 
+  // Read from JS on demand (for a time-left readout), not on every frame.
+  const getProgress = useCallback(
+    () => ({
+      offset: offset.value,
+      max: Math.max(contentHeight.value - viewHeight.value, 0),
+    }),
+    [offset, contentHeight, viewHeight],
+  );
+
   return {
     ref,
     onScroll,
+    getProgress,
     onContentSizeChange: (_width: number, height: number) => {
       contentHeight.value = height;
     },

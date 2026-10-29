@@ -18,6 +18,7 @@
     "@react-native-async-storage/async-storage": "catalog:",
     "@react-native-community/slider": "catalog:",
     "@types/react": "catalog:",
+    "expo-blur": "catalog:",
     "expo-crypto": "catalog:",
     "expo-haptics": "catalog:",
     "expo-keep-awake": "catalog:",

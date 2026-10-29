@@ -10,5 +10,10 @@ export default function PrompterPage() {
     return null;
   }
 
-  return script ? <Prompter script={script} /> : <Redirect href="/" />;
+  // Keyed by id, so switching scripts remounts the prompter with fresh state.
+  return script ? (
+    <Prompter key={script.id} script={script} />
+  ) : (
+    <Redirect href="/" />
+  );
 }

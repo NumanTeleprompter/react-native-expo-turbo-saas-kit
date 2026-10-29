@@ -44,6 +44,7 @@
     "@react-navigation/native": "catalog:",
     "@tanstack/react-query": "catalog:",
     "expo": "catalog:",
+    "expo-blur": "catalog:",
     "expo-constants": "catalog:",
     "expo-crypto": "catalog:",
     "expo-dev-client": "catalog:",

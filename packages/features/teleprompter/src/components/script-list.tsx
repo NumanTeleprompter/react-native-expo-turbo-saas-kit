@@ -6,13 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Icon, Text } from '@kit/ui';
 
 import { type Script, useScripts } from '../lib/script-store';
-
-const countWords = (text: string) =>
-  text.trim().split(/\s+/).filter(Boolean).length;
-
-// The preview shows the script without its markdown markup.
-const plainText = (markdown: string) =>
-  markdown.replace(/^\s*(#{1,3}|>|[-*+]|\d+[.)])\s+/gm, '').replace(/\*+/g, '');
+import { countWords, plainText } from '../lib/text';
 
 export function ScriptList() {
   const { scripts, loaded } = useScripts();
