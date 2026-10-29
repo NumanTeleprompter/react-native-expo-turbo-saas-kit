@@ -4,27 +4,39 @@ import { useKeepAwake } from 'expo-keep-awake';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
+  BackHandler,
   Pressable,
   StyleSheet,
   Text,
   View,
   useWindowDimensions,
 } from 'react-native';
-import Animated from 'react-native-reanimated';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 
+import { withAlpha } from '../lib/color';
 import {
+  type PrompterSettings,
   scrollSpeed,
   updatePrompterSettings,
   usePrompterSettings,
 } from '../lib/prompter-settings';
 import type { Script } from '../lib/script-store';
 import { useAutoScroll } from '../lib/use-auto-scroll';
+import { MarkdownText } from './markdown-text';
 import { PrompterControls } from './prompter-controls';
+import { SettingsSheet } from './settings-sheet';
 
 const COUNTDOWN_SECONDS = 3;
 // Where the first line sits, and where the reading band is, as a share of the
 // screen height.
 const READING_LINE = 0.35;
+// While the settings sheet is open the script slides up by this share of the
+// screen height, so the text being styled stays visible above the sheet.
+const SETTINGS_SHIFT = 0.3;
 
 export function Prompter({ script }: { script: Script }) {
   useKeepAwake();
@@ -33,6 +45,26 @@ export function Prompter({ script }: { script: Script }) {
   const { height } = useWindowDimensions();
   const [playing, setPlaying] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
+  const shift = useSharedValue(0);
+
+  useEffect(() => {
+    shift.value = withTiming(settingsOpen ? -height * SETTINGS_SHIFT : 0, {
+      duration: 280,
+    });
+  }, [settingsOpen, height, shift]);
+
+  // One transform list for both, since a later `transform` style would
+  // replace an earlier one.
+  const mirror = settings.mirror;
+
+  const stageStyle = useAnimatedStyle(
+    () => ({
+      transform: [{ translateY: shift.value }, { scaleX: mirror ? -1 : 1 }],
+    }),
+    [mirror],
+  );
 
   const scroll = useAutoScroll({
     playing,
@@ -58,6 +90,24 @@ export function Prompter({ script }: { script: Script }) {
     return () => clearTimeout(timer);
   }, [countdown]);
 
+  // Hardware back closes the sheet first instead of leaving the prompter.
+  useEffect(() => {
+    if (!settingsOpen) {
+      return;
+    }
+
+    const subscription = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => {
+        setSettingsOpen(false);
+
+        return true;
+      },
+    );
+
+    return () => subscription.remove();
+  }, [settingsOpen]);
+
   const toggle = () => {
     if (playing) {
       setPlaying(false);
@@ -66,13 +116,24 @@ export function Prompter({ script }: { script: Script }) {
     }
   };
 
+  const openSettings = () => {
+    setPlaying(false);
+    setCountdown(null);
+    setSettingsOpen(true);
+  };
+
+  const update = (patch: Partial<PrompterSettings>) =>
+    void updatePrompterSettings(patch).catch(console.error);
+
   const lineHeight = settings.fontSize * 1.4;
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[styles.container, { backgroundColor: settings.backgroundColor }]}
+    >
       <StatusBar hidden />
 
-      <View style={[styles.flex, settings.mirror && styles.mirrored]}>
+      <Animated.View style={[styles.flex, stageStyle]}>
         <Animated.ScrollView
           ref={scroll.ref}
           onScroll={scroll.onScroll}
@@ -92,15 +153,12 @@ export function Prompter({ script }: { script: Script }) {
             onPress={toggle}
             style={styles.text}
           >
-            <Text
-              style={{
-                color: '#ffffff',
-                fontSize: settings.fontSize,
-                lineHeight,
-              }}
-            >
-              {script.body}
-            </Text>
+            <MarkdownText
+              source={script.body}
+              color={settings.textColor}
+              fontSize={settings.fontSize}
+              align={settings.align}
+            />
           </Pressable>
         </Animated.ScrollView>
 
@@ -108,10 +166,14 @@ export function Prompter({ script }: { script: Script }) {
           pointerEvents="none"
           style={[
             styles.readingBand,
-            { top: height * READING_LINE, height: lineHeight },
+            {
+              top: height * READING_LINE,
+              height: lineHeight,
+              backgroundColor: withAlpha(settings.textColor, 0.1),
+            },
           ]}
         />
-      </View>
+      </Animated.View>
 
       {countdown !== null && countdown > 0 ? (
         <Pressable onPress={toggle} style={styles.countdown}>
@@ -119,33 +181,33 @@ export function Prompter({ script }: { script: Script }) {
         </Pressable>
       ) : null}
 
-      {countdown === null ? (
+      {countdown === null && !settingsOpen ? (
         <PrompterControls
-          settings={settings}
+          speed={settings.speed}
           playing={playing}
-          onChange={(patch) =>
-            void updatePrompterSettings(patch).catch(console.error)
-          }
+          onSpeedChange={(speed) => update({ speed })}
           onToggle={toggle}
           onRestart={scroll.restart}
           onBack={() => router.back()}
+          onOpenSettings={openSettings}
         />
       ) : null}
+
+      <SettingsSheet
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        settings={settings}
+        onChange={update}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000000' },
+  container: { flex: 1 },
   flex: { flex: 1 },
-  mirrored: { transform: [{ scaleX: -1 }] },
   text: { paddingHorizontal: 24 },
-  readingBand: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-  },
+  readingBand: { position: 'absolute', left: 0, right: 0 },
   countdown: {
     ...StyleSheet.absoluteFillObject,
     alignItems: 'center',

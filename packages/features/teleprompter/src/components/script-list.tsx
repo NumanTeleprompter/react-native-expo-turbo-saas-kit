@@ -10,6 +10,10 @@ import { type Script, useScripts } from '../lib/script-store';
 const countWords = (text: string) =>
   text.trim().split(/\s+/).filter(Boolean).length;
 
+// The preview shows the script without its markdown markup.
+const plainText = (markdown: string) =>
+  markdown.replace(/^\s*(#{1,3}|>|[-*+]|\d+[.)])\s+/gm, '').replace(/\*+/g, '');
+
 export function ScriptList() {
   const { scripts, loaded } = useScripts();
   const insets = useSafeAreaInsets();
@@ -54,7 +58,7 @@ function ScriptItem({ script }: { script: Script }) {
         </Text>
 
         <Text className="text-muted-foreground" numberOfLines={2}>
-          {script.body || 'Empty script'}
+          {plainText(script.body) || 'Empty script'}
         </Text>
 
         <Text className="text-muted-foreground text-xs">

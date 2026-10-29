@@ -2,70 +2,65 @@ import type { ComponentType } from 'react';
 
 import {
   ArrowLeft,
-  FlipHorizontal2,
   Minus,
+  Pause,
   Play,
   Plus,
   RotateCcw,
+  SlidersHorizontal,
 } from 'lucide-react-native';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import {
-  FONT_SIZE_RANGE,
-  type PrompterSettings,
-  SPEED_RANGE,
-} from '../lib/prompter-settings';
+import { SPEED_RANGE } from '../lib/prompter-settings';
 
 type IconComponent = ComponentType<{ color?: string; size?: number }>;
 
 type Props = {
-  settings: PrompterSettings;
+  speed: number;
   playing: boolean;
-  onChange: (patch: Partial<PrompterSettings>) => void;
+  onSpeedChange: (speed: number) => void;
   onToggle: () => void;
   onRestart: () => void;
   onBack: () => void;
+  onOpenSettings: () => void;
 };
 
-const clamp = (value: number, min: number, max: number) =>
-  Math.min(max, Math.max(min, value));
+const clampSpeed = (speed: number) =>
+  Math.min(SPEED_RANGE.max, Math.max(SPEED_RANGE.min, speed));
 
 export function PrompterControls({
-  settings,
+  speed,
   playing,
-  onChange,
+  onSpeedChange,
   onToggle,
   onRestart,
   onBack,
+  onOpenSettings,
 }: Props) {
   const insets = useSafeAreaInsets();
 
   const speedStepper = (
     <Stepper
       label="Speed"
-      value={settings.speed}
-      onDecrease={() =>
-        onChange({
-          speed: clamp(settings.speed - 1, SPEED_RANGE.min, SPEED_RANGE.max),
-        })
-      }
-      onIncrease={() =>
-        onChange({
-          speed: clamp(settings.speed + 1, SPEED_RANGE.min, SPEED_RANGE.max),
-        })
-      }
+      value={speed}
+      onDecrease={() => onSpeedChange(clampSpeed(speed - 1))}
+      onIncrease={() => onSpeedChange(clampSpeed(speed + 1))}
     />
   );
 
-  // While playing, keep only a dimmed speed control within reach.
+  // While playing, keep only a dimmed speed control and a pause button.
   if (playing) {
     return (
       <View
         style={[styles.compact, { bottom: insets.bottom + 16 }]}
         pointerEvents="box-none"
       >
-        <View style={styles.dimmed}>{speedStepper}</View>
+        <View style={[styles.stepper, styles.dimmed]}>
+          {speedStepper}
+
+          <RoundButton icon={Pause} label="Pause" onPress={onToggle} />
+        </View>
       </View>
     );
   }
@@ -77,39 +72,13 @@ export function PrompterControls({
       </View>
 
       <View style={[styles.panel, { paddingBottom: insets.bottom + 16 }]}>
-        <View style={styles.row}>
-          {speedStepper}
+        {speedStepper}
 
-          <Stepper
-            label="Size"
-            value={settings.fontSize}
-            onDecrease={() =>
-              onChange({
-                fontSize: clamp(
-                  settings.fontSize - FONT_SIZE_RANGE.step,
-                  FONT_SIZE_RANGE.min,
-                  FONT_SIZE_RANGE.max,
-                ),
-              })
-            }
-            onIncrease={() =>
-              onChange({
-                fontSize: clamp(
-                  settings.fontSize + FONT_SIZE_RANGE.step,
-                  FONT_SIZE_RANGE.min,
-                  FONT_SIZE_RANGE.max,
-                ),
-              })
-            }
-          />
-        </View>
-
-        <View style={styles.row}>
+        <View style={styles.actions}>
           <RoundButton
-            icon={FlipHorizontal2}
-            label="Mirror"
-            active={settings.mirror}
-            onPress={() => onChange({ mirror: !settings.mirror })}
+            icon={RotateCcw}
+            label="Back to start"
+            onPress={onRestart}
           />
 
           <RoundButton
@@ -121,9 +90,9 @@ export function PrompterControls({
           />
 
           <RoundButton
-            icon={RotateCcw}
-            label="Back to start"
-            onPress={onRestart}
+            icon={SlidersHorizontal}
+            label="Settings"
+            onPress={onOpenSettings}
           />
         </View>
       </View>
@@ -141,7 +110,7 @@ function Stepper(props: {
     <View style={styles.stepper}>
       <RoundButton
         icon={Minus}
-        label={`Decrease ${props.label}`}
+        label={`Decrease ${props.label}, now ${props.value}`}
         onPress={props.onDecrease}
       />
 
@@ -152,7 +121,7 @@ function Stepper(props: {
 
       <RoundButton
         icon={Plus}
-        label={`Increase ${props.label}`}
+        label={`Increase ${props.label}, now ${props.value}`}
         onPress={props.onIncrease}
       />
     </View>
@@ -198,17 +167,17 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
+    alignItems: 'center',
     gap: 16,
     paddingTop: 16,
     paddingHorizontal: 16,
     backgroundColor: 'rgba(0,0,0,0.85)',
   },
-  row: {
+  actions: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'space-around',
-    rowGap: 12,
+    alignSelf: 'stretch',
   },
   compact: { position: 'absolute', left: 0, right: 0, alignItems: 'center' },
   dimmed: { opacity: 0.35 },

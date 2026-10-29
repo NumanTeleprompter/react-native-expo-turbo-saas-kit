@@ -22,7 +22,7 @@ Expo + Supabase starter kit (MakerKit), a pnpm + Turborepo monorepo. It targets 
 
 - **App:** `apps/expo-app` — Expo Router (file-based), NativeWind, React Query, React Hook Form + Zod.
 - **Packages:** `packages/features/{auth,account,teleprompter}`, `packages/supabase` (client, auth hooks), `packages/ui` (`@kit/ui` components), `tooling/*` (shared configs).
-- **Teleprompter:** the scroll loop is `lib/use-auto-scroll.ts` (Reanimated frame callback, UI thread). Scroll speed in px/s scales with font size, so a speed level keeps the same reading pace. Routes are in `app/(app)/(teleprompter)`.
+- **Teleprompter:** the scroll loop is `lib/use-auto-scroll.ts` (Reanimated frame callback, UI thread). Scroll speed in px/s scales with font size, so a speed level keeps the same reading pace. Routes are in `app/(app)/(teleprompter)`. Scripts render a markdown subset (`lib/markdown.ts`: headings, bold, italic, lists, quotes, rules; no nesting). Display settings live in a bottom sheet (`components/settings-sheet.tsx`) that doesn't dim the prompter, which slides up so changes show live.
 - **Backend:** local Supabase (Docker) in `apps/expo-app/supabase`. The only table is `public.accounts`, with RLS and a signup trigger.
 - **Conventions:** `.cursorrules` has the full code standards. The key ones are kebab-case files, types over interfaces, features in `packages/features`, RLS on every new table, and explicit `public.` schemas.
 
@@ -50,4 +50,7 @@ Setup: if `apps/expo-app/.env` is missing, copy it from `.env.template`, and hav
 - **Text:** string children must be wrapped in `<Text>`; a raw string inside a `<View>` throws on every platform.
 - **Android Gradle:** React Native 0.83.6's Gradle plugin pins `foojay-resolver` 0.5.0, which fails on the Gradle 9.0.0 wrapper that prebuild generates (`JvmVendorSpec ... IBM_SEMERU`). After the first `expo run:android`, set `distributionUrl` in `android/gradle/wrapper/gradle-wrapper.properties` to `gradle-8.14.3-bin.zip`. `android/` is gitignored, so redo this whenever it is regenerated. JDK 24 is too new; use Android Studio's JDK as above.
 - **NativeWind `Pressable`:** function-style props (`style={({ pressed }) => ...}`) are ignored. Use a static style plus `android_ripple`.
+- **Metro crashes:** after file saves, NativeWind's Tailwind watcher can kill Metro (`TypeError ... reading 'addedFiles'`). Dev-only; restart `pnpm exec expo start --dev-client`. The app then runs stale JS until you force-stop and relaunch it.
+- **Native modules:** new ones (slider, haptics) need a native rebuild. `expo run:android` refuses to run while any attached device is `unauthorized`; use `ANDROID_SERIAL=<serial> ./gradlew app:installDebug` in `android/` (flags as in the Android row) to target one device.
+- **Reanimated Babel plugin:** warns on any `.value` inside an inline `style`, even a plain object's; read it into a variable first. Two `transform` styles on one view replace each other, so combine them in one list.
 - **Testing on the emulator:** `adb shell input text` crashes the dev build (NPE in `ReactActivityDelegate.onKeyUp`) when no text input has focus, and the stray keys land in other apps. Tap the field first and confirm with `adb shell dumpsys input_method | grep mServedView`.

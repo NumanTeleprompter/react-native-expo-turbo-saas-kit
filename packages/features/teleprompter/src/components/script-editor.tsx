@@ -82,7 +82,9 @@ function ScriptForm({ script }: { script?: Script }) {
 
       <Textarea
         className="min-h-64"
-        placeholder="Paste or type your script"
+        placeholder={
+          'Paste or type your script.\n\nMarkdown works: # headings, **bold**, *italic*, - lists, > quotes'
+        }
         value={body}
         onChangeText={setBody}
       />

@@ -9,6 +9,7 @@ catalog:
   "@hookform/resolvers": ^5.2.2
   "@manypkg/cli": ^0.25.1
   "@react-native-async-storage/async-storage": 2.2.0
+  "@react-native-community/slider": 5.1.2
   "@react-navigation/native": ^7.2.4
   "@rn-primitives/accordion": ^1.4.0
   "@rn-primitives/alert-dialog": ^1.4.0
@@ -69,6 +70,7 @@ catalog:
   expo-image-manipulator: ~55.0.16
   expo-image-picker: ~55.0.20
   expo-font: ~55.0.7
+  expo-haptics: ~55.0.14
   expo-keep-awake: ~55.0.8
   expo-linking: ~55.0.15
   expo-router: ~55.0.14

@@ -24,6 +24,9 @@ catalogs:
     '@react-native-async-storage/async-storage':
       specifier: 2.2.0
       version: 2.2.0
+    '@react-native-community/slider':
+      specifier: 5.1.2
+      version: 5.1.2
     '@react-navigation/native':
       specifier: ^7.2.4
       version: 7.2.4
@@ -198,6 +201,9 @@ catalogs:
     expo-font:
       specifier: ~55.0.7
       version: 55.0.7
+    expo-haptics:
+      specifier: ~55.0.14
+      version: 55.0.18
     expo-image-manipulator:
       specifier: ~55.0.16
       version: 55.0.16
@@ -380,6 +386,9 @@ importers:
       '@react-native-async-storage/async-storage':
         specifier: 'catalog:'
         version: 2.2.0(react-native@0.83.6(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))
+      '@react-native-community/slider':
+        specifier: 'catalog:'
+        version: 5.1.2
       '@react-navigation/native':
         specifier: 'catalog:'
         version: 7.2.4(react-native@0.83.6(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)
@@ -401,6 +410,9 @@ importers:
       expo-font:
         specifier: 'catalog:'
         version: 55.0.7(expo@55.0.24)(react-native@0.83.6(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)
+      expo-haptics:
+        specifier: 'catalog:'
+        version: 55.0.18(expo@55.0.24)
       expo-keep-awake:
         specifier: 'catalog:'
         version: 55.0.8(expo@55.0.24)(react@19.2.0)
@@ -628,12 +640,18 @@ importers:
       '@react-native-async-storage/async-storage':
         specifier: 'catalog:'
         version: 2.2.0(react-native@0.83.6(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))
+      '@react-native-community/slider':
+        specifier: 'catalog:'
+        version: 5.1.2
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.14
       expo-crypto:
         specifier: 'catalog:'
         version: 55.0.15(expo@55.0.24)
+      expo-haptics:
+        specifier: 'catalog:'
+        version: 55.0.18(expo@55.0.24)
       expo-keep-awake:
         specifier: 'catalog:'
         version: 55.0.8(expo@55.0.24)(react@19.2.0)
@@ -649,6 +667,9 @@ importers:
       react:
         specifier: 'catalog:'
         version: 19.2.0
+      react-native-gesture-handler:
+        specifier: 'catalog:'
+        version: 2.30.1(react-native@0.83.6(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)
       react-native-reanimated:
         specifier: 'catalog:'
         version: 4.2.1(react-native-worklets@0.7.4(@babel/core@7.29.0)(react-native@0.83.6(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0))(react-native@0.83.6(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)
@@ -2727,6 +2748,9 @@ packages:
     peerDependencies:
       react-native: ^0.0.0-0 || >=0.65 <1.0
 
+  '@react-native-community/slider@5.1.2':
+    resolution: {integrity: sha512-UV/MjCyCtSjS5BQDrrGIMmCXm309xEG6XbR0Dj65kzTraJSVDxSjQS2uBUXgX+5SZUOCzCxzv3OufOZBdtQY4w==}
+
   '@react-native/assets-registry@0.83.6':
     resolution: {integrity: sha512-iljb4ue1yWJ3EhySz7EjV6CzSVrI2uNtR8BI2jzP5+QS5E4Cl3fdIJRmVwDEx1pu8uE97PGEusGRHnoaZ9Q3jg==}
     engines: {node: '>= 20.19.4'}
@@ -4604,6 +4628,11 @@ packages:
       expo: '*'
       react: '*'
       react-native: '*'
+
+  expo-haptics@55.0.18:
+    resolution: {integrity: sha512-bEH0bf5bBGn7U2eTZVdiXBUk4vTfNGbfv9/9PCYLg3gL7L/WE2g8WKs2vYg1B4/BDSucyO8prZofH3IgvLJojQ==}
+    peerDependencies:
+      expo: '*'
 
   expo-image-loader@55.0.0:
     resolution: {integrity: sha512-NOjp56wDrfuA5aiNAybBIjqIn1IxKeGJ8CECWZncQ/GzjZfyTYAHTCyeApYkdKkMBLHINzI4BbTGSlbCa0fXXQ==}
@@ -9685,6 +9714,8 @@ snapshots:
       merge-options: 3.0.4
       react-native: 0.83.6(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0)
 
+  '@react-native-community/slider@5.1.2': {}
+
   '@react-native/assets-registry@0.83.6': {}
 
   '@react-native/babel-plugin-codegen@0.83.6(@babel/core@7.29.0)':
@@ -11890,6 +11921,10 @@ snapshots:
       expo: 55.0.24(@babel/core@7.29.0)(@expo/dom-webview@55.0.6)(@expo/metro-runtime@55.0.11)(expo-router@55.0.14)(react-dom@19.2.0(react@19.2.0))(react-native-worklets@0.7.4(@babel/core@7.29.0)(react-native@0.83.6(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0))(react-native@0.83.6(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)(typescript@5.9.3)
       react: 19.2.0
       react-native: 0.83.6(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0)
+
+  expo-haptics@55.0.18(expo@55.0.24):
+    dependencies:
+      expo: 55.0.24(@babel/core@7.29.0)(@expo/dom-webview@55.0.6)(@expo/metro-runtime@55.0.11)(expo-router@55.0.14)(react-dom@19.2.0(react@19.2.0))(react-native-worklets@0.7.4(@babel/core@7.29.0)(react-native@0.83.6(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0))(react-native@0.83.6(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)(typescript@5.9.3)
 
   expo-image-loader@55.0.0(expo@55.0.24):
     dependencies:
