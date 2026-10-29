@@ -25,12 +25,29 @@ export default function Root({ children }: PropsWithChildren) {
 
         {/* Using raw CSS styles as an escape-hatch to ensure the background color never flickers in dark-mode. */}
         <style dangerouslySetInnerHTML={{ __html: responsiveBackground }} />
+        {/*
+          Supabase can send auth links (e.g. a password recovery email sent from Studio) to the site root with the
+          tokens in the URL fragment. The router would redirect and drop the fragment, so forward the link to the
+          callback route before any app code runs.
+        */}
+        <script dangerouslySetInnerHTML={{ __html: forwardAuthLinkScript }} />
         {/* Add any additional <head> elements that you want globally available on web... */}
       </head>
       <body>{children}</body>
     </html>
   );
 }
+
+const forwardAuthLinkScript = `
+(function () {
+  var hash = window.location.hash;
+  if (
+    hash.indexOf('access_token=') !== -1 &&
+    window.location.pathname.indexOf('/auth/callback') !== 0
+  ) {
+    window.history.replaceState(null, '', '/auth/callback' + hash);
+  }
+})();`;
 
 const responsiveBackground = `
 body {
